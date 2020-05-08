@@ -3,8 +3,9 @@
 void aplicacion(){
     productos tt;
     tt.lectura();
+    tt.cargar_combos();
     int opc1,opc2=0;
-    string conta,contu,ced;
+    string conta,ced;
     cout<<"1. Ingresar como administrador.\n2. Ingresar como usuario.\n";cin>>opc1;
     cin.ignore();
     switch (opc1) {
@@ -27,10 +28,13 @@ void aplicacion(){
                 }
             }
             else cout<<"La contraseña ingresada no es correcta\n"<<endl;
+            tt.guardar_combos();
             cout<<"Ha salido.\n";
         break;
         case 2:
-            cout<<"hola";
+            tt.cargar_combos();
+            cout<<"Ingrese su cedula: ";cin>>ced;
+            tt.ver_combo();
         break;
         default:
             break;

@@ -145,3 +145,61 @@ void productos::ver_combo()
     }
 }
 
+void productos::cargar_combos()
+{
+    map<string,string> gasto;
+    string linea,combo,id,cantidad,costo,nombre;
+    ifstream k("combos.txt");
+    while(!k.eof()){
+        getline(k,linea);
+        combo=linea[0];
+        costo.clear();
+        nombre.clear();
+        for(int i=0;linea[i]!='\0';i++){
+            if(linea[i-1]=='*'){
+                for(;linea[i]!='+';i+=4){
+                    id=linea[i];
+                    cantidad=linea[i+2];
+                    gasto.insert(pair<string,string>(id,cantidad));
+                }
+            }
+            else if(linea[i-1]=='+'){
+                for(;linea[i]!=' ';i++){
+                    costo=costo+linea[i];
+                }
+                gasto.insert(pair<string,string>("costo",costo));
+            }
+            else if(linea[i-1]=='.'){
+                for(;linea[i]!='\0';i++){
+                    nombre=nombre+linea[i];
+                }
+                gasto.insert(pair<string,string>("nombre",nombre));
+                i--;
+            }
+        }
+        combos.insert(pair<string,map<string,string>>(combo,gasto));
+        gasto.clear();
+    }
+}
+
+void productos::guardar_combos()
+{
+    ofstream k1("combos.txt");
+    k1.close();
+    string linea;
+    for(c=combos.begin();c!=combos.end();c++){
+        linea=linea+c->first+" *";
+        for(a=c->second.begin();a!=c->second.find("costo");a++){
+            linea=linea+a->first+" "+a->second+" ";
+        }
+        a=c->second.find("costo");
+        linea=linea+"+"+a->second+" .";
+        a++;
+        linea=linea+a->second;
+        ofstream k("combos.txt", ios::app);
+        k<<linea;
+        k.close();
+        linea="\n";
+    }
+}
+
