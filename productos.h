@@ -9,6 +9,11 @@ public:
     void ver_combo();
     void cargar_combos();
     void guardar_combos();
+    void comprar_combo(string combo);
+    void eliminar_producto_vacio();
+    void guardar_inventario();
+    void eliminar_combo();
+    void realizar_compra();
 private:
     map<string,list<string>> id_valores;
     map<string,list<string>>::iterator r;

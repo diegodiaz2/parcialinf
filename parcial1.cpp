@@ -3,9 +3,11 @@
 void aplicacion(){
     productos tt;
     tt.lectura();
+    tt.eliminar_producto_vacio();
     tt.cargar_combos();
+    tt.eliminar_combo();
     int opc1,opc2=0;
-    string conta,ced;
+    string conta,ced,combo;
     cout<<"1. Ingresar como administrador.\n2. Ingresar como usuario.\n";cin>>opc1;
     cin.ignore();
     switch (opc1) {
@@ -32,13 +34,20 @@ void aplicacion(){
             cout<<"Ha salido.\n";
         break;
         case 2:
-            tt.cargar_combos();
             cout<<"Ingrese su cedula: ";cin>>ced;
             tt.ver_combo();
+            cout<<"Para seleccionar el combo que desea comprar ingrese el numero del combo: ";cin>>combo;
+            tt.comprar_combo(combo);
+
+
         break;
         default:
             break;
     }
+    tt.eliminar_producto_vacio();
+    tt.eliminar_combo();
+    tt.guardar_combos();
+    tt.guardar_inventario();
     system ("pause");
     system("cls");
 }

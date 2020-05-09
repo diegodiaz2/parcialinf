@@ -203,3 +203,89 @@ void productos::guardar_combos()
     }
 }
 
+void productos::comprar_combo(string combo)
+{
+    string cantidad,unidad,unidades,costo;
+    int valor,Unidades,Cantidad;
+    c=combos.find(combo);
+    if(c!=combos.end()){
+        for(a=c->second.begin();a!=c->second.find("costo");a++){
+            r=id_valores.find(a->first);
+            if(r!=id_valores.end()){
+                l=r->second.begin();
+                cantidad=*l;l++;
+                unidad=*l;l++;
+                unidades=*l;l++;
+                costo=*l;
+                Unidades=stoi(unidades)-stoi(a->second);
+                valor=(stoi(costo)/stoi(unidades))*Unidades;
+                Cantidad=Unidades/stoi(unidad);
+                *l=to_string(valor);l--;
+                *l=to_string(Unidades);l--;
+                l--;
+                *l=to_string(Cantidad);
+            }
+            else cout<<"Hubo un problema comprando el combo"<<endl;
+        }
+    }
+    else cout<<"Este combo no existe."<<endl;
+}
+
+void productos::eliminar_producto_vacio()
+{
+    for(r=id_valores.begin();r!=id_valores.end();r++){
+        l=r->second.begin();
+        if(stoi(*l)==0) id_valores.erase(r->first);
+    }
+}
+
+void productos::guardar_inventario()
+{
+    string linea;
+    ofstream k1("productos.txt");
+    k1.close();
+    for(r=id_valores.begin();r!=id_valores.end();r++){
+        linea=linea+r->first;
+        l=r->second.begin();
+        for(l=r->second.begin();l!=r->second.end();l++){
+            linea=linea+" "+(*l);
+        }
+        ofstream k("productos.txt", ios::app);
+        k<<linea;
+        k.close();
+        linea="\n";
+    }
+}
+
+void productos::eliminar_combo()
+{
+    map<string,map<string,string>>::iterator m;
+    map<string,map<string,string>>::iterator n;
+    for(c=combos.begin();c!=combos.end();c++){
+        for(a=c->second.begin();a!=c->second.find("costo") and a!=c->second.find("nombre");a++){
+            r=id_valores.find(a->first);
+            if(r!=id_valores.end()){
+                l=r->second.begin();
+                l++;l++;
+                if(stoi(*l)-stoi(a->second)<0){
+                    n=c;
+                    n++;
+                    for(m=c;n!=combos.end();n++,m++){
+                        combos[m->first]=n->second;
+                    }
+                    combos.erase(m->first);
+                }
+            }
+            else{
+                m=c;
+                n=c;
+                n++;
+                for(;n!=combos.end();n++,m++){
+                    combos[m->first]=n->second;
+                }
+                combos.erase(m->first);
+            }
+        }
+    }
+}
+
