@@ -19,18 +19,18 @@ void aplicacion(){
             if(verifivar_contr(conta)){
                 while(opc2<4){
                     tt.visualizar_inventario();
+                    cout<<endl<<endl;
                     cout<<"1. Ingresar un producto.\n2. Crear un combo.\n3. Generar un reporte de ventas."
                           "\nDe lo contrario saldra."<<endl;cin>>opc2;
                     if(opc2==1)tt.ingresar_producto();//Ingresa o modifica un producto al inventario
                     else if(opc2==2){
-                        tt.crear_combo();
                         tt.ver_combo();
+                        tt.crear_combo();
                     }
                     else if(opc2==3)tt.ingresar_producto();
                 }
             }
             else cout<<"La contraseña ingresada no es correcta\n"<<endl;
-            tt.guardar_combos();
             cout<<"Ha salido.\n";
         break;
         case 2:

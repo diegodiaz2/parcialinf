@@ -7,47 +7,50 @@ void productos::lectura()
     int m=0,i,v;
     string linea,id,cantidad,unidades,unidades_totales,nombre,valor;
     ifstream k("productos.txt");
-    while(!k.eof()){
-        getline(k,linea);
-        i=0;
-        m=0;
-        cantidad.clear();
-        unidades.clear();
-        id.clear();
-        unidades_totales.clear();
-        nombre.clear();
-        valor.clear();
-        v=1;
-        while(linea[i]!='\0'){
-            if(linea[i]!=' '){
-                if(m==0)id=id+linea[i];
-                else if(m==1)cantidad=cantidad+linea[i];
-                else if(m==2)unidades=unidades+linea[i];
-                else if(m==3)unidades_totales=unidades_totales+linea[i];
-                else if(m==4)valor=valor+linea[i];
-                else nombre=nombre+linea[i];
-            }
-            else{
-                m++;
-                if(m>4 and v!=1){
-                    nombre=nombre+linea[i];
+    if(k.good()){
+        while(!k.eof()){
+            getline(k,linea);
+            i=0;
+            m=0;
+            cantidad.clear();
+            unidades.clear();
+            id.clear();
+            unidades_totales.clear();
+            nombre.clear();
+            valor.clear();
+            v=1;
+            while(linea[i]!='\0'){
+                if(linea[i]!=' '){
+                    if(m==0)id=id+linea[i];
+                    else if(m==1)cantidad=cantidad+linea[i];
+                    else if(m==2)unidades=unidades+linea[i];
+                    else if(m==3)unidades_totales=unidades_totales+linea[i];
+                    else if(m==4)valor=valor+linea[i];
+                    else nombre=nombre+linea[i];
                 }
-                else if(m>4 and v==1){
-                    v=0;
+                else{
+                    m++;
+                    if(m>4 and v!=1){
+                        nombre=nombre+linea[i];
+                    }
+                    else if(m>4 and v==1){
+                        v=0;
+                    }
                 }
+                i++;
             }
-            i++;
+            lista.push_back(cantidad);
+            lista.push_back(unidades);
+            lista.push_back(unidades_totales);
+            lista.push_back(valor);
+            lista.push_back(nombre);
+            //cout<<"id "<<id<<" cantidad "<<cantidad<<" unidades "<<unidades<<" unidades totales "<<unidades_totales<<endl;
+            id_valores.insert(pair<string,list<string>>(id,lista));
+            lista.clear();
         }
-        lista.push_back(cantidad);
-        lista.push_back(unidades);
-        lista.push_back(unidades_totales);
-        lista.push_back(valor);
-        lista.push_back(nombre);
-        //cout<<"id "<<id<<" cantidad "<<cantidad<<" unidades "<<unidades<<" unidades totales "<<unidades_totales<<endl;
-        id_valores.insert(pair<string,list<string>>(id,lista));
-        lista.clear();
+        k.close();
     }
-    k.close();
+    else cout<<"No hay ningun producto en el inventario."<<endl;
 }
 
 void productos::ingresar_producto()
@@ -147,59 +150,69 @@ void productos::ver_combo()
 
 void productos::cargar_combos()
 {
+    bool ban=1;
     map<string,string> gasto;
     string linea,combo,id,cantidad,costo,nombre;
     ifstream k("combos.txt");
-    while(!k.eof()){
-        getline(k,linea);
-        combo=linea[0];
-        costo.clear();
-        nombre.clear();
-        for(int i=0;linea[i]!='\0';i++){
-            if(linea[i-1]=='*'){
-                for(;linea[i]!='+';i+=4){
-                    id=linea[i];
-                    cantidad=linea[i+2];
-                    gasto.insert(pair<string,string>(id,cantidad));
+    if(k.good()){
+        while(!k.eof()){
+            getline(k,linea);
+            combo=linea[0];
+            costo.clear();
+            nombre.clear();
+            for(int i=0;linea[i]!='\0';i++){
+                if(linea[i-1]=='*'){
+                    for(;linea[i]!='+';i++){
+                        for(;linea[i]!=' ';i++)id=id+linea[i];
+                        i++;
+                        for(;linea[i]!=' ';i++)cantidad=cantidad+linea[i];
+                        gasto.insert(pair<string,string>(id,cantidad));
+                        id.clear();
+                        cantidad.clear();
+                    }
+                }
+                else if(linea[i-1]=='+'){
+                    for(;linea[i]!=' ';i++){
+                        costo=costo+linea[i];
+                    }
+                    gasto.insert(pair<string,string>("costo",costo));
+                }
+                else if(linea[i-1]=='.'){
+                    for(;linea[i]!='\0';i++){
+                        nombre=nombre+linea[i];
+                    }
+                    gasto.insert(pair<string,string>("nombre",nombre));
+                    i--;
                 }
             }
-            else if(linea[i-1]=='+'){
-                for(;linea[i]!=' ';i++){
-                    costo=costo+linea[i];
-                }
-                gasto.insert(pair<string,string>("costo",costo));
-            }
-            else if(linea[i-1]=='.'){
-                for(;linea[i]!='\0';i++){
-                    nombre=nombre+linea[i];
-                }
-                gasto.insert(pair<string,string>("nombre",nombre));
-                i--;
-            }
+            combos.insert(pair<string,map<string,string>>(combo,gasto));
+            gasto.clear();
         }
-        combos.insert(pair<string,map<string,string>>(combo,gasto));
-        gasto.clear();
     }
+    else cout<<"Por el momento no hay ningun combo disponible."<<endl;
 }
 
 void productos::guardar_combos()
 {
-    ofstream k1("combos.txt");
-    k1.close();
-    string linea;
-    for(c=combos.begin();c!=combos.end();c++){
-        linea=linea+c->first+" *";
-        for(a=c->second.begin();a!=c->second.find("costo");a++){
-            linea=linea+a->first+" "+a->second+" ";
+    cout<<"Tamaño de combo"<<combos.size()<<endl;
+    if(combos.size()>0){
+        ofstream k1("combos.txt");
+        k1.close();
+        string linea;
+        for(c=combos.begin();c!=combos.end();c++){
+            linea=linea+c->first+" *";
+            for(a=c->second.begin();a!=c->second.find("costo");a++){
+                linea=linea+a->first+" "+a->second+" ";
+            }
+            a=c->second.find("costo");
+            linea=linea+"+"+a->second+" .";
+            a++;
+            linea=linea+a->second;
+            ofstream k("combos.txt", ios::app);
+            k<<linea;
+            k.close();
+            linea="\n";
         }
-        a=c->second.find("costo");
-        linea=linea+"+"+a->second+" .";
-        a++;
-        linea=linea+a->second;
-        ofstream k("combos.txt", ios::app);
-        k<<linea;
-        k.close();
-        linea="\n";
     }
 }
 
