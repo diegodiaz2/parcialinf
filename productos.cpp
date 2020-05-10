@@ -1,15 +1,16 @@
 #include "productos.h"
 
 
-void productos::lectura()
+void productos::lectura()//se lee el inventario
+//a tomar en cuenta de que si no tenemos ningun  producto el archivo no debe existir
 {
-    list<string> lista;
+    list<string> lista;//en esta lista iran: cantidad de paquetes, unidad por pquete, unidades totales, costo, nombre
     int m=0,i,v;
     string linea,id,cantidad,unidades,unidades_totales,nombre,valor;
-    ifstream k("productos.txt");
-    if(k.good()){
-        while(!k.eof()){
-            getline(k,linea);
+    ifstream k("productos.txt");//se abre el archiivo productos para cargar la informacion
+    if(k.good()){//se verifica de que el archvio si exista
+        while(!k.eof()){//todo dentro del while se realiza hasta encontrar el final del archivo
+            getline(k,linea);//se obtiene una linea, donde se encuentra toda la informacion de un producto
             i=0;
             m=0;
             cantidad.clear();
@@ -19,37 +20,43 @@ void productos::lectura()
             nombre.clear();
             valor.clear();
             v=1;
-            while(linea[i]!='\0'){
-                if(linea[i]!=' '){
-                    if(m==0)id=id+linea[i];
-                    else if(m==1)cantidad=cantidad+linea[i];
-                    else if(m==2)unidades=unidades+linea[i];
-                    else if(m==3)unidades_totales=unidades_totales+linea[i];
-                    else if(m==4)valor=valor+linea[i];
-                    else nombre=nombre+linea[i];
+            while(linea[i]!='\0'){//se realiza hasta encontrar el final del string
+                //se procede a sacar la informacion del archivo, esta se encuentra ordenada asi:
+                //"id" "cantidad de paquetes" "unidades por paquete" "unidades totales" "costo" "nombre del producto"/n
+                if(linea[i]!=' '){//se ignoran los espacios
+                    //hay un contador m, que va aunmentando a medida que encontramos un espacio
+                    //dado que si se encuentra un espacio pasamos a una informacion distinta
+                    if(m==0)id=id+linea[i];//obtiene el id;
+                    else if(m==1)cantidad=cantidad+linea[i];//obtiene la cantidad de paquetes
+                    else if(m==2)unidades=unidades+linea[i];//obtiene las unidades por paquete
+                    else if(m==3)unidades_totales=unidades_totales+linea[i];//obtiene las unidades totales
+                    else if(m==4)valor=valor+linea[i];//obtiene el valor
+                    else nombre=nombre+linea[i];//obtiene el nombre del producto
                 }
                 else{
                     m++;
-                    if(m>4 and v!=1){
+                    if(m>4 and v!=1){//si ya estamos encontrando el nombre los espacios son tomados en cuenta
                         nombre=nombre+linea[i];
                     }
-                    else if(m>4 and v==1){
+                    else if(m>4 and v==1){//mientras que estemos hayando algun dato distinto al nombre v permanece en 1
                         v=0;
                     }
                 }
                 i++;
             }
-            lista.push_back(cantidad);
-            lista.push_back(unidades);
-            lista.push_back(unidades_totales);
-            lista.push_back(valor);
-            lista.push_back(nombre);
-            //cout<<"id "<<id<<" cantidad "<<cantidad<<" unidades "<<unidades<<" unidades totales "<<unidades_totales<<endl;
+            lista.push_back(cantidad);//como primera posicion tenemos la cantidad
+            lista.push_back(unidades);//segunda: las unidades por paquete
+            lista.push_back(unidades_totales);//tercera: unidades totales
+            lista.push_back(valor);//cuarta: valor
+            lista.push_back(nombre);//quinta: nombre
+            //se agregan los valores a un mapa de la siguiente forma:
+            //{id:[cantidad,unidades por paquete,unidades totales,valor,nombre]}
             id_valores.insert(pair<string,list<string>>(id,lista));
-            lista.clear();
+            lista.clear();//se limpia la lista para obtener las productos
         }
         k.close();
     }
+    //se muestra en dado caso de que el archivo no exista, y por ende no hayan productos
     else cout<<"No hay ningun producto en el inventario."<<endl;
 }
 
@@ -194,34 +201,42 @@ void productos::cargar_combos()
 
 void productos::guardar_combos()
 {
-    cout<<"Tamaño de combo"<<combos.size()<<endl;
     if(combos.size()>0){
         ofstream k1("combos.txt");
         k1.close();
         string linea;
-        for(c=combos.begin();c!=combos.end();c++){
-            linea=linea+c->first+" *";
-            for(a=c->second.begin();a!=c->second.find("costo");a++){
-                linea=linea+a->first+" "+a->second+" ";
+        cout<<combos.size();
+        if(combos.size()>0){
+            for(c=combos.begin();c!=combos.end();c++){
+                linea=linea+c->first+" *";
+                for(a=c->second.begin();a!=c->second.find("costo");a++){
+                    linea=linea+a->first+" "+a->second+" ";
+                }
+                a=c->second.find("costo");
+                linea=linea+"+"+a->second+" .";
+                a++;
+                linea=linea+a->second;
+                ofstream k("combos.txt", ios::app);
+                k<<linea;
+                k.close();
+                linea="\n";
             }
-            a=c->second.find("costo");
-            linea=linea+"+"+a->second+" .";
-            a++;
-            linea=linea+a->second;
-            ofstream k("combos.txt", ios::app);
-            k<<linea;
-            k.close();
-            linea="\n";
         }
+    }
+    else {
+        remove("combos.txt");
     }
 }
 
-void productos::comprar_combo(string combo)
+void productos::comprar_combo(string combo,string cedula)
 {
     string cantidad,unidad,unidades,costo;
     int valor,Unidades,Cantidad;
     c=combos.find(combo);
     if(c!=combos.end()){
+        while(pagar(combo,cedula)){
+            cout<<"No es suficiente dinero."<<endl;
+        }
         for(a=c->second.begin();a!=c->second.find("costo");a++){
             r=id_valores.find(a->first);
             if(r!=id_valores.end()){
@@ -244,11 +259,15 @@ void productos::comprar_combo(string combo)
     else cout<<"Este combo no existe."<<endl;
 }
 
-void productos::eliminar_producto_vacio()
+void productos::eliminar_producto_vacio()//si tenemos un producto con 0 unidades totales, este sera eliminado
 {
-    for(r=id_valores.begin();r!=id_valores.end();r++){
-        l=r->second.begin();
-        if(stoi(*l)==0) id_valores.erase(r->first);
+    for(r=id_valores.begin();r!=id_valores.end();r++){//con un iterador ubicamos la posicion de la clave, su id
+        l=r->second.begin();//con otro iterador de lista ubicamos la tercera posicion de la lista,unid totales
+        l++;l++;
+        if(stoi(*l)==0) {
+            id_valores.erase(r->first);//si esta es 0 sera eliminado
+            r=id_valores.begin();
+        }
     }
 }
 
@@ -287,6 +306,11 @@ void productos::eliminar_combo()
                         combos[m->first]=n->second;
                     }
                     combos.erase(m->first);
+                    if(combos.size()>0){
+                        c=combos.begin();
+                        a=c->second.find("costo");
+                    }
+                    else return;
                 }
             }
             else{
@@ -297,8 +321,62 @@ void productos::eliminar_combo()
                     combos[m->first]=n->second;
                 }
                 combos.erase(m->first);
+                if(combos.size()>0){
+                    c=combos.begin();
+                    a=c->second.find("costo");
+                }
+                else return;
             }
         }
+    }
+}
+
+bool productos::pagar(string combo,string cedula){
+    int din[10]={50000,20000,10000,5000,2000,1000,500,200,100,50},cant[10]={},dine=0,num;
+    for(int i=0;i<=9;i++){
+        cout<<"Ingrese la cantidad de billetes de "<<din[i]<<" que desea ingresar: ";cin>>num;
+        dine=dine+(din[i]*num);
+    }
+    c=combos.find(combo);
+    a=c->second.find("costo");
+    dine=dine-stoi(a->second);
+    if (dine>=0){
+        cout<<"Sus vueltos son los siguientes."<<endl;
+        for (int i=0;i<=9;i++){
+            cant[i]=dine/din[i];
+            dine=dine%din[i];
+            cout<<din[i]<<": "<<cant[i]<<endl;
+        }
+        reporte(cedula,combo);
+        return 0;
+    }
+    else{
+
+        return 1;
+    }
+}
+
+void productos::reporte(string cedula,string combo)
+{
+    string linea;
+    linea=cedula+" compro: ";
+    c=combos.find(combo);
+    a=c->second.find("nombre");
+    linea=linea+a->second+" ";
+    a=c->second.find("costo");
+    linea=linea+a->second+"\n";
+    ofstream k("reporte.txt", ios::app);
+    k<<linea;
+    k.close();
+}
+
+void productos::generar_reporte()
+{
+    string linea;
+    ifstream k("reporte.txt");
+    while(!k.eof()){
+        getline(k,linea);
+        cout<<linea<<endl;
     }
 }
 
