@@ -1,4 +1,16 @@
 #include "parcial1.h"
+
+
+//estructura de id_Valores = map<string,list<string>>
+//{id1:[cantidad de paquetes,unidades por paquete,unidades totales,costo,nombre],
+//id2:[cantidad de paquetes,unidades por paquete,unidades totales,costo,nombre],...,
+//idn:[cantidad de paquetes,unidades por paquete,unidades totales,costo,nombre]}
+
+//estructura de combos= map<string,map<string,string>>
+//{combo1:{producto1:unidades gastadas,producto2:unidades gastadas,...,producton:unidades gastadas},
+//combo2:{producto1:unidades gastadas,producto2:unidades gastadas,...,producton:unidades gastadas},...,
+//combon:{producto1:unidades gastadas,producto2:unidades gastadas,...,producton:unidades gastadas}}
+
 class productos
 {
 public:

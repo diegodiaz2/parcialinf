@@ -6,8 +6,10 @@ CONFIG -= qt
 SOURCES += \
         main.cpp \
         parcial1.cpp \
-        productos.cpp
+        productos.cpp \
+        usuario.cpp
 
 HEADERS += \
     parcial1.h \
-    productos.h
+    productos.h \
+    usuario.h

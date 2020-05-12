@@ -7,7 +7,7 @@ void productos::lectura()//se lee el inventario
     list<string> lista;//en esta lista iran: cantidad de paquetes, unidad por pquete, unidades totales, costo, nombre
     int m=0,i,v;
     string linea,id,cantidad,unidades,unidades_totales,nombre,valor;
-    ifstream k("productos.txt");//se abre el archiivo productos para cargar la informacion
+    ifstream k("../Parcial1/productos.txt");//se abre el archiivo productos para cargar la informacion
     if(k.good()){//se verifica de que el archvio si exista
         while(!k.eof()){//todo dentro del while se realiza hasta encontrar el final del archivo
             getline(k,linea);//se obtiene una linea, donde se encuentra toda la informacion de un producto
@@ -99,7 +99,7 @@ void productos::ingresar_producto()//ingresa o modifica productos del inventario
     else {//si el id no se encontro, se creara un nuevo elemento
         //se pide que ingrese los valores que debe tener el producto
         cout<<"El costo de cada paquete es: ";cin>>costo;
-        cout<<"Ingrese cuantas unidades por paquete tiene el producto: ";cin>>unidades;
+        cout<<"Ingrese cuantas unidades por paquete o los gramos que tiene el producto: ";cin>>unidades;
         cout<<"Ingrese la cantidad a agregar: ";cin>>cantidad;
         cin.ignore();
         cout<<"Ingrese el nombre con el que desea guardarlo: ";getline(cin,nombre);
@@ -140,12 +140,12 @@ void productos::crear_combo()//permite crear un combo
     string nombre,ingrediente,unidades_usadas,valor;
     cin.ignore();
     cout<<"Ingrese el nombre del combo: ";getline(cin,nombre);
-    cout<<"Ingrese la cantidad de ingredientes que usara: ";cin>>cant;
+    cout<<"Ingrese la cantidad de ingredientes: ";cin>>cant;
     for(int i=0;i<cant;i++){
         //pregunto por el id de un producto del inventario, en ejecucion este sera mostrado.
         cout<<"Ingrese el ID del ingrediente: ";cin>>ingrediente;
         //oregunta cuantas unidades va a gastar debido a que puede tener 2, por ejemplo: hamburgues doble carne.
-        cout<<"Ingrese las unidad que se usaran: ";cin>>unidades_usadas;
+        cout<<"Ingrese las unidad o los gramos que se usaran: ";cin>>unidades_usadas;
         gasto.insert(pair<string,string>(ingrediente,unidades_usadas));//agrega a un map el id y las unidades gastadas
     }
     //el costo del combo es ingresado por el administrador
@@ -159,10 +159,13 @@ void productos::crear_combo()//permite crear un combo
 
 void productos::ver_combo()//nos eprmite visualisar el numero, nombre y costo del combo
 {
-    for(c=combos.begin();c!=combos.end();c++){//recorre combo elemento por elemento
-        //imprime la informacion que debe ser conocida por el usuario
-        cout<<c->first<<". "<<c->second["nombre"]<<". "<<c->second["costo"]<<endl;
+    if(combos.size()>0){
+        for(c=combos.begin();c!=combos.end();c++){//recorre combo elemento por elemento
+            //imprime la informacion que debe ser conocida por el usuario
+            cout<<c->first<<". "<<c->second["nombre"]<<". "<<c->second["costo"]<<endl;
+        }
     }
+    else cout<<"No hay ningun combo disponible."<<endl;
 }
 
 void productos::cargar_combos()//lee los combos disponibles guardados anteriormente
@@ -173,7 +176,7 @@ void productos::cargar_combos()//lee los combos disponibles guardados anteriorme
     */
     map<string,string> gasto;
     string linea,combo,id,cantidad,costo,nombre;
-    ifstream k("combos.txt");//abre el archivo combos.txt
+    ifstream k("../Parcial1/combos.txt");//abre el archivo combos.txt
     if(k.good()){//verifica la exitencia
         while(!k.eof()){//realiza las siguientes acciones hasta que se encuentre el fin del archivo
             getline(k,linea);//obtiene linea por linea
@@ -216,7 +219,7 @@ void productos::cargar_combos()//lee los combos disponibles guardados anteriorme
 void productos::guardar_combos()//guarda los combos actualmente disponibles en combos.txt
 {
     if(combos.size()>0){//si combos.size>0 es porque si existen combos
-        ofstream k1("combos.txt");//abrimos el archivo para limpiarlo
+        ofstream k1("../Parcial1/combos.txt");//abrimos el archivo para limpiarlo
         k1.close();
         string linea;
         //cout<<combos.size();
@@ -231,14 +234,14 @@ void productos::guardar_combos()//guarda los combos actualmente disponibles en c
             a++;
             linea=linea+a->second;//agregamos al string el nombre
             //abrimos el archivo, de tal forma que siempre se escriba al final de este, sin sobreescribir la informacion
-            ofstream k("combos.txt", ios::app);
+            ofstream k("../Parcial1/combos.txt", ios::app);
             k<<linea;//manda el string con toda la informacion de un combo
             k.close();
             linea="\n";
         }
     }
     else {//dado que no existen combos se elimina el archivo combos.txt
-        remove("combos.txt");
+        remove("../Parcial1/combos.txt");
     }
 }
 
@@ -294,7 +297,7 @@ void productos::eliminar_producto_vacio()//si tenemos un producto con 0 unidades
 void productos::guardar_inventario()//GUARDA EL INVENTARIO, SI YA NO HAY UNIDADES SON ELIMINADOS
 {
     string linea;
-    ofstream k1("productos.txt");//abre y cierra el archivo, de tal forma que quede en blanco
+    ofstream k1("../Parcial1/productos.txt");//abre y cierra el archivo, de tal forma que quede en blanco
     k1.close();
     //en un string guarda los valores que tiene un producto con su id
     for(r=id_valores.begin();r!=id_valores.end();r++){
@@ -304,7 +307,7 @@ void productos::guardar_inventario()//GUARDA EL INVENTARIO, SI YA NO HAY UNIDADE
             //va sacando la informacion restante de la lista, que esta como valor en el map id_valores
             linea=linea+" "+(*l);
         }
-        ofstream k("productos.txt", ios::app);//abre el archivo y va guardando estas lineas
+        ofstream k("../Parcial1/productos.txt", ios::app);//abre el archivo y va guardando estas lineas
         k<<linea;
         k.close();
         linea="\n";
@@ -394,7 +397,7 @@ void productos::reporte(string cedula,string combo)//guarda la informacion de la
     linea=linea+a->second+" ";//agrega el combo que compro
     a=c->second.find("costo");
     linea=linea+a->second+"\n";//agrega el costo de este
-    ofstream k("reporte.txt", ios::app);//abre el archivo reporte.txt, y agrega la linea al final del archivo
+    ofstream k("../Parcial1/reporte.txt", ios::app);//abre el archivo reporte.txt, y agrega la linea al final del archivo
     k<<linea;
     k.close();
 }
@@ -402,7 +405,7 @@ void productos::reporte(string cedula,string combo)//guarda la informacion de la
 void productos::generar_reporte()//muestra en consola el reporte
 {
     string linea;
-    ifstream k("reporte.txt");
+    ifstream k("../Parcial1/reporte.txt");
     if(k.good()){//si el archivo existe hace lo siguiente
         while(!k.eof()){
             getline(k,linea);

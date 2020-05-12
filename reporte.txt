@@ -1,0 +1,12 @@
+1005011956 compro: Hamburguesa con gaseosa 10000
+1005011956 compro: Hamburguesa con gaseosa 10000
+1005011956 compro: Perro con gaseosa 5000
+1005011956 compro: Hamburguesa con gaseosa 10000
+60256739 compro: Palomitas con gaseosa 10000
+60256739 compro: Hamburguesa doble carne con gaseosa 12000
+1005011956 compro: Palomitas con gaseosa 10000
+1005011956 compro: Hamburguesa doble carne con gaseosa 12000
+1005011956 compro: Hamburguesa doble carne con gaseosa 12000
+1005011956 compro: Hamburguesa con gaseosa 10000
+60256739 compro: 4 10000
+1005011956 compro: Palomitas con gaseosa 10000
